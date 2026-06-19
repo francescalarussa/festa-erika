@@ -14,12 +14,14 @@ body {
   overflow-x: hidden;
 }
 
-/* 🌟 STELLE */
+/* ⭐ STELLE */
 .stars {
   position: fixed;
   width: 100%;
   height: 100%;
   z-index: 0;
+  top: 0;
+  left: 0;
 }
 
 .star {
@@ -37,6 +39,7 @@ body {
   to { transform: translateY(-800px); opacity: 0; }
 }
 
+/* layout */
 .container {
   position: relative;
   z-index: 2;
@@ -55,7 +58,7 @@ body {
   opacity: 0.8;
 }
 
-.date {
+.date, .location {
   opacity: 0.7;
 }
 
@@ -63,7 +66,7 @@ body {
   background: rgba(255,255,255,0.06);
   backdrop-filter: blur(12px);
   border-radius: 20px;
-  padding: 30px;
+  padding: 25px;
   margin-top: 20px;
 }
 
@@ -82,11 +85,6 @@ button {
   cursor: pointer;
 }
 
-.rsvp-list {
-  text-align: left;
-  margin-top: 20px;
-}
-
 .item {
   padding: 10px;
   border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -96,43 +94,104 @@ button {
 
 <body>
 
+<!-- STELLE -->
 <div class="stars" id="stars"></div>
 
 <div class="container">
 
   <div class="hero">
     <h1>🎉 Festa di saluto</h1>
-    <p class="subtitle">ERIKA parte per Bologna ✨</p>
+    <p class="subtitle"><strong>ERIKA</strong> parte per Bologna ✨</p>
     <p class="date">📅 28 Giugno 2026 • 18:30</p>
-    <p>📍 Via San Sebastiano 26, Nole (TO)</p>
+    <p class="location">📍 Via San Sebastiano 26, Nole (TO)</p>
   </div>
 
   <div class="card">
     <h3>Conferma presenza</h3>
+
     <input id="nome" placeholder="Nome">
     <input id="persone" type="number" placeholder="Persone">
+
     <button onclick="addRSVP()">Conferma 🚀</button>
   </div>
 
   <div class="card">
-    <h3>📋 Crew della serata</h3>
+    <h3>📋 Lista invitati</h3>
     <div id="list"></div>
   </div>
 
 </div>
 
+<!-- ⭐ STELLE FIX -->
 <script>
-/* STELLE */
-const stars = document.getElementById("stars");
+window.addEventListener("DOMContentLoaded", () => {
+  const stars = document.getElementById("stars");
 
-for (let i = 0; i < 80; i++) {
-  const s = document.createElement("div");
-  s.className = "star";
-  s.style.left = Math.random() * 100 + "%";
-  s.style.top = Math.random() * 100 + "%";
-  s.style.animationDuration = (2 + Math.random() * 5) + "s";
-  stars.appendChild(s);
-}
+  for (let i = 0; i < 100; i++) {
+    const s = document.createElement("div");
+    s.className = "star";
+    s.style.left = Math.random() * 100 + "%";
+    s.style.top = Math.random() * 100 + "%";
+    s.style.animationDuration = (2 + Math.random() * 5) + "s";
+    stars.appendChild(s);
+  }
+});
+</script>
+
+<!-- 🔥 FIREBASE MODERNO -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* 🔥 INCOLLA QUI LA TUA CONFIG FIREBASE */
+const firebaseConfig = {
+  apiKey: "XXX",
+  authDomain: "XXX",
+  projectId: "XXX",
+  storageBucket: "XXX",
+  messagingSenderId: "XXX",
+  appId: "XXX"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const rsvpRef = collection(db, "rsvp");
+
+/* ➕ RSVP */
+window.addRSVP = async function () {
+  const nome = document.getElementById("nome").value;
+  const persone = document.getElementById("persone").value;
+
+  if (!nome) return;
+
+  await addDoc(rsvpRef, {
+    nome,
+    persone: persone || 1,
+    time: Date.now()
+  });
+
+  document.getElementById("nome").value = "";
+  document.getElementById("persone").value = "";
+};
+
+/* 📡 LIVE LIST */
+const q = query(rsvpRef, orderBy("time", "desc"));
+
+onSnapshot(q, (snapshot) => {
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  snapshot.forEach((doc) => {
+    const d = doc.data();
+
+    list.innerHTML += `
+      <div class="item">
+        👤 ${d.nome} — 👥 ${d.persone || 1}
+      </div>
+    `;
+  });
+});
 </script>
 
 </body>
