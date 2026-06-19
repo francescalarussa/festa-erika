@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Festa di saluto</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #0b0b1a, #000);
+  color: white;
+  overflow-x: hidden;
+}
+
+/* 🌟 STELLE ANIMATE */
+.stars {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: 0;
+}
+
+.star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: float 6s linear infinite;
+}
+
+@keyframes float {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-800px); opacity: 0; }
+}
+
+.container {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  margin: auto;
+  padding: 40px;
+  text-align: center;
+}
+
+.card {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 30px;
+  margin-top: 20px;
+}
+
+input, button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  background: linear-gradient(90deg,#ff4ecd,#7c4dff);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.rsvp-list {
+  text-align: left;
+  margin-top: 20px;
+}
+
+.item {
+  padding: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+</style>
+</head>
+
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <h1>🎉 Festa di saluto</h1>
+  <p><strong>ERIKA </strong> parte per Bologna!!!</p>
+  <p>📍 Via San Sebastiano 26, Nole (TO)</p>
+
+  <div class="card">
+    <h3>Conferma presenza</h3>
+
+    <input id="nome" placeholder="Nome">
+    <input id="persone" type="number" placeholder="Persone">
+
+    <button onclick="addRSVP()">Conferma 🚀</button>
+  </div>
+
+  <div class="card">
+    <h3>📋 Crew della serata! </h3>
+    <div id="list" class="rsvp-list"></div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+<script>
+/* 🌟 STELLE */
+const stars = document.getElementById("stars");
+for (let i = 0; i < 80; i++) {
+  const s = document.createElement("div");
+  s.className = "star";
+  s.style.left = Math.random() * 100 + "%";
+  s.style.top = Math.random() * 100 + "%";
+  s.style.animationDuration = (2 + Math.random() * 5) + "s";
+  stars.appendChild(s);
+}
+
+/* 🔥 FIREBASE CONFIG (INCOLLA QUI) */
+const firebaseConfig = {
+  apiKey: "XXX",
+  authDomain: "XXX",
+  projectId: "XXX",
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const col = db.collection("rsvp");
+
+/* ➕ AGGIUNGI RSVP */
+function addRSVP() {
+  const nome = document.getElementById("nome").value;
+  const persone = document.getElementById("persone").value;
+
+  if (!nome) return;
+
+  col.add({
+    nome,
+    persone,
+    time: Date.now()
+  });
+
+  document.getElementById("nome").value = "";
+  document.getElementById("persone").value = "";
+}
+
+/* 📡 LISTA LIVE */
+col.orderBy("time","desc").onSnapshot(snapshot => {
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  snapshot.forEach(doc => {
+    const d = doc.data();
+    list.innerHTML += `
+      <div class="item">
+        👤 ${d.nome} — 👥 ${d.persone || 1}
+      </div>
+    `;
+  });
+});
+</script>
+
+</body>
+</html>
