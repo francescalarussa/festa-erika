@@ -8,18 +8,16 @@
 <style>
 body {
   margin: 0;
-  font-family: 'Poppins', sans-serif;
+  font-family: Arial, sans-serif;
   background: radial-gradient(circle at top, #0b0b1a, #000);
   color: white;
   overflow-x: hidden;
 }
 
-/* 🌟 STELLE ANIMATE */
 .stars {
   position: fixed;
   width: 100%;
   height: 100%;
-  background: transparent;
   z-index: 0;
 }
 
@@ -47,11 +45,36 @@ body {
   text-align: center;
 }
 
+.hero h1 {
+  font-size: 44px;
+  font-weight: bold;
+  background: linear-gradient(90deg,#ff4ecd,#7c4dff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  opacity: 0.8;
+  margin-top: 5px;
+}
+
+.date, .location {
+  opacity: 0.7;
+  margin-top: 5px;
+}
+
+.countdown {
+  margin-top: 15px;
+  font-size: 18px;
+  color: #ff4ecd;
+  font-weight: bold;
+}
+
 .card {
   background: rgba(255,255,255,0.06);
   backdrop-filter: blur(12px);
   border-radius: 20px;
-  padding: 30px;
+  padding: 25px;
   margin-top: 20px;
 }
 
@@ -72,12 +95,14 @@ button {
 
 .rsvp-list {
   text-align: left;
-  margin-top: 20px;
+  margin-top: 15px;
 }
 
 .item {
-  padding: 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
 }
 </style>
 </head>
@@ -87,9 +112,17 @@ button {
 <div class="stars" id="stars"></div>
 
 <div class="container">
-  <h1>🎉 Festa di saluto</h1>
-  <p><strong>ERIKA </strong> parte per Bologna!!!</p>
-  <p>📍 Via San Sebastiano 26, Nole (TO)</p>
+
+  <div class="hero">
+    <h1>🎉 Festa di saluto</h1>
+    <p class="subtitle">per <strong>ERIKA</strong></p>
+    <p class="subtitle">Una serata insieme prima della nuova avventura ✨</p>
+
+    <p class="date">📅 28 Giugno 2026 • 18.30</p>
+    <p class="location">📍 Via San Sebastiano 26, Nole (TO)</p>
+
+    <div id="countdown" class="countdown"></div>
+  </div>
 
   <div class="card">
     <h3>Conferma presenza</h3>
@@ -101,17 +134,18 @@ button {
   </div>
 
   <div class="card">
-    <h3>📋 Crew della serata! </h3>
+    <h3>📋 Lista invitati</h3>
     <div id="list" class="rsvp-list"></div>
   </div>
+
 </div>
 
-<!-- Firebase -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 
 <script>
-/* 🌟 STELLE */
+/* STELLE */
 const stars = document.getElementById("stars");
 for (let i = 0; i < 80; i++) {
   const s = document.createElement("div");
@@ -122,18 +156,34 @@ for (let i = 0; i < 80; i++) {
   stars.appendChild(s);
 }
 
-/* 🔥 FIREBASE CONFIG (INCOLLA QUI) */
+/* COUNTDOWN */
+const eventDate = new Date("2026-07-12T19:30:00").getTime();
+
+function updateCountdown() {
+  const now = new Date().getTime();
+  const diff = eventDate - now;
+
+  const days = Math.floor(diff / (1000*60*60*24));
+  const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+
+  document.getElementById("countdown").innerHTML =
+    `⏳ ${days} giorni e ${hours} ore`;
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+/* FIREBASE */
 const firebaseConfig = {
   apiKey: "XXX",
   authDomain: "XXX",
-  projectId: "XXX",
+  projectId: "XXX"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const col = db.collection("rsvp");
 
-/* ➕ AGGIUNGI RSVP */
+/* RSVP */
 function addRSVP() {
   const nome = document.getElementById("nome").value;
   const persone = document.getElementById("persone").value;
@@ -150,7 +200,7 @@ function addRSVP() {
   document.getElementById("persone").value = "";
 }
 
-/* 📡 LISTA LIVE */
+/* LIVE LIST */
 col.orderBy("time","desc").onSnapshot(snapshot => {
   const list = document.getElementById("list");
   list.innerHTML = "";
@@ -168,3 +218,4 @@ col.orderBy("time","desc").onSnapshot(snapshot => {
 
 </body>
 </html>
+   
