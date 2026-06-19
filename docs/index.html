@@ -6,6 +6,10 @@
 <title>Festa di saluto</title>
 
 <style>
+html, body {
+  height: 100%;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -39,7 +43,6 @@ body {
   to { transform: translateY(-800px); opacity: 0; }
 }
 
-/* layout */
 .container {
   position: relative;
   z-index: 2;
@@ -94,7 +97,6 @@ button {
 
 <body>
 
-<!-- STELLE -->
 <div class="stars" id="stars"></div>
 
 <div class="container">
@@ -144,22 +146,23 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, addDoc, query, orderBy, onSnapshot }
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* 🔥 INCOLLA QUI LA TUA CONFIG FIREBASE */
+/* 🔥 FIREBASE CONFIG (INSERITA) */
 const firebaseConfig = {
-  apiKey: "XXX",
-  authDomain: "XXX",
-  projectId: "XXX",
-  storageBucket: "XXX",
-  messagingSenderId: "XXX",
-  appId: "XXX"
+  apiKey: "AIzaSyClBlef2bnEdC_y2GO_ixngywQMlUSQUUg",
+  authDomain: "festa-erika.firebaseapp.com",
+  projectId: "festa-erika",
+  storageBucket: "festa-erika.firebasestorage.app",
+  messagingSenderId: "201063866010",
+  appId: "1:201063866010:web:d159e8023ff963ce220923",
+  measurementId: "G-55V9KE3XQX"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const rsvpRef = collection(db, "rsvp");
 
-/* ➕ RSVP */
-window.addRSVP = async function () {
+/* ➕ RSVP FUNZIONE */
+globalThis.addRSVP = async function () {
   const nome = document.getElementById("nome").value;
   const persone = document.getElementById("persone").value;
 
